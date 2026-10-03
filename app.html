@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HueClash - will your colors still be told apart?</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; background:#1c1410; color:#f7efe6; line-height:1.5; }
+  .wrap { max-width:700px; margin:0 auto; padding:26px 16px 50px; }
+  h1 { font-size:28px; } h1 span { color:#fb923c; }
+  .sub { color:#c4b2a0; margin:6px 0 16px; }
+  .card { background:#2b1f17; border-radius:14px; padding:14px; margin-bottom:12px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; }
+  label { font-size:12px; color:#c4b2a0; display:block; margin-bottom:3px; }
+  input,select { width:100%; background:#1c1410; color:#f7efe6; border:1px solid #6b5646; border-radius:8px; padding:8px; font-size:15px; font-family:inherit; }
+  button { background:#9a4a12; color:#f7efe6; border:0; padding:8px 14px; border-radius:8px; cursor:pointer; font-size:14px; margin-right:6px; margin-top:10px; }
+  table { width:100%; border-collapse:collapse; } td,th { text-align:left; padding:8px 4px; border-bottom:1px solid #4a3a2e; } th { font-size:12px; color:#c4b2a0; font-weight:600; }
+  td.v { font-size:22px; font-weight:800; color:#fb923c; } tr.me td.v { color:#f7efe6; }
+  .stats { display:flex; gap:22px; flex-wrap:wrap; margin-top:12px; } .stats b { display:block; font-size:20px; } .muted { color:#c4b2a0; font-size:13px; }
+  .err { color:#ff9c8a; } .note { font-size:12.5px; color:#9a8776; margin-top:6px; }
+
+  td.v { font-size:17px; } td, th { font-size:14px; } .bar { height:10px; background:#1c1410; border-radius:6px; overflow:hidden; margin-top:6px; } .bar i { display:block; height:100%; background:#fb923c; } .bar i.over { background:#ff7b72; } .no { color:#ff9c8a; }
+  .cb { display:inline-flex; align-items:center; gap:4px; margin-right:12px; font-size:14px; color:#f7efe6; } .cb input { width:auto; } .big { font-family:monospace; font-size:26px; font-weight:800; color:#fb923c; } td.v.m { font-family:monospace; }
+  textarea { width:100%; background:#1c1410; color:#f7efe6; border:1px solid #6b5646; border-radius:8px; padding:8px; font-size:14px; font-family:monospace; min-height:110px; } .ok { color:#86efac; font-weight:700; } .no { color:#ff9c8a; } td.m { font-family:monospace; } .chip { display:inline-block; font-family:monospace; background:#1c1410; border-radius:6px; padding:2px 6px; margin:2px 4px 2px 0; }
+  textarea { width:100%; background:#1c1410; color:#f7efe6; border:1px solid #6b5646; border-radius:8px; padding:8px; font-size:13px; font-family:monospace; min-height:130px; } .badge { display:inline-block; font-weight:800; padding:4px 12px; border-radius:20px; background:#1c1410; } .bar { height:14px; background:#1c1410; border-radius:8px; position:relative; margin:12px 0 6px; overflow:hidden; } .bar i.f { position:absolute; left:0; top:0; bottom:0; background:#e07a28; } .bar i.n { position:absolute; top:0; bottom:0; width:3px; background:#fff; }
+  .seg { display:inline-block; height:22px; background:#e07a28; border-radius:4px; margin:2px 2px 2px 0; vertical-align:middle; } .seg.last { background:#9a4a12; } .chip { display:inline-block; font-family:monospace; background:#1c1410; border-radius:6px; padding:2px 8px; margin:2px 4px 2px 0; font-size:16px; }
+.sw{display:inline-block;width:62px;margin:0 6px 6px 0;text-align:center;font-size:10.5px;font-family:monospace;color:#c4b2a0}.sw i{display:block;height:46px;border-radius:8px;margin-bottom:2px;border:1px solid #4a3a2e}.rowt{font-size:13px;color:#c4b2a0;margin:10px 0 4px;font-weight:700}.f{padding:5px 0;border-bottom:1px solid #4a3a2e;font-size:14px}.bad{color:#ff9c8a;font-weight:700}.good{color:#86efac;font-weight:700}input[type=range]{padding:0}</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Hue<span>Clash</span></h1>
+  <div class="sub">Paste your chart or UI colors. See how they look with red-green and blue-yellow color vision deficiency, and which pairs collapse into each other.</div>
+  <div class="card">
+    <label>Colors, one hex per line (3 or 6 digits, up to 12)</label>
+    <textarea id="t" spellcheck="false" style="min-height:130px"></textarea>
+    <button id="p1">Traffic light</button><button id="p2">Red and green chart</button><button id="p3">Blue and orange</button><button id="p4">Rainbow of six</button>
+    <div class="grid" style="margin-top:12px"><div><label>Severity <b id="sv">1.0</b> (1.0 = full dichromacy)</label><input id="s" type="range" min="0" max="1" step="0.05" value="1"></div><div><label>Clash below this difference (CIE76 &#916;E)</label><input id="lim" value="10"></div><div><label>Apply the matrix to</label><select id="mode"><option value="lin">linear light (default)</option><option value="raw">raw sRGB values</option></select></div></div>
+  </div>
+  <div class="card"><div id="out"></div></div>
+  <div class="card"><h2 style="margin:0 0 8px;font-size:15px">Pairs that collapse</h2><div id="cl"></div></div>
+  <div class="note">Simulation uses the matrices from Machado, Oliveira and Fernandes (2009), taken from the authors' page, with a blend of the two nearest tabulated severities in between. Protan means missing or weak red cones, deutan green, tritan blue; 1.0 is full dichromacy. The page does not state whether the matrices apply to linear or gamma-encoded values, so both modes are offered; linear light is the default (the common practice, not confirmed by the source I read). The clash limit of 10 on the CIE76 scale is my own rule of thumb, not a standard: lower it if you also use labels or patterns. Only pairs that differ at least that much in normal vision but not after simulation, or that were already too close, are listed. Screens and real eyes vary; this is a screening aid, not a diagnosis. Runs in your browser, nothing stored.</div>
+</div>
+<script src="engine.js"></script>
+<script>
+(function () {
+  var H = window.HueClash, $ = function (i) { return document.getElementById(i); };
+  var PRE = { p1: ['#2e9e4f', '#f2c230', '#d63a2f'], p2: ['#c8402a', '#6b8e23', '#2c5fa8', '#808080'], p3: ['#1f6fd1', '#f08c1a', '#7a7a7a', '#222222'], p4: ['#e6194b', '#f58231', '#ffe119', '#3cb44b', '#4363d8', '#911eb4'] };
+  Object.keys(PRE).forEach(function (k) { $(k).onclick = function () { $('t').value = PRE[k].join('\n'); run(); }; });
+  var NAMES = { protan: 'Protan (no red)', deutan: 'Deutan (no green)', tritan: 'Tritan (no blue)' };
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function sw(rgb, label) { return '<span class="sw"><i style="background:' + H.toHex(rgb) + '"></i>' + esc(label) + '</span>'; }
+  function run() {
+    var sev = +$('s').value, lim = parseFloat($('lim').value), opts = { linear: $('mode').value === 'lin' };
+    $('sv').textContent = sev.toFixed(2);
+    var lines = $('t').value.split(/\n/).map(function (l) { return l.trim(); }).filter(Boolean), colors = [], bad = [];
+    lines.forEach(function (l) { var c = H.parseHex(l); if (c) colors.push(c); else bad.push(l); });
+    if (!(lim > 0)) { $('out').innerHTML = '<span class="err">Enter a clash limit above 0.</span>'; $('cl').innerHTML = ''; return; }
+    if (colors.length > 12) { $('out').innerHTML = '<span class="err">Up to 12 colors, please.</span>'; $('cl').innerHTML = ''; return; }
+    if (!colors.length) { $('out').innerHTML = '<span class="muted">' + (bad.length ? '<span class="err">None of those lines is a hex color.</span>' : 'Add some colors.') + '</span>'; $('cl').innerHTML = ''; return; }
+    var h = bad.length ? '<div class="err" style="margin-bottom:6px">Skipped: ' + bad.map(esc).join(', ') + '</div>' : '';
+    h += '<div class="rowt">Normal vision</div>' + colors.map(function (c, i) { return sw(c, (i + 1) + ' ' + H.toHex(c)); }).join('');
+    var cl = '';
+    H.TYPES.forEach(function (t) {
+      h += '<div class="rowt">' + NAMES[t] + '</div>' + colors.map(function (c, i) { var s = H.simulate(c, t, sev, opts); return sw(s, (i + 1) + ' ' + H.toHex(s)); }).join('');
+      var cs = H.clashes(colors, t, sev, opts, lim);
+      cl += '<div class="rowt">' + NAMES[t] + '</div>' + (cs.length ? cs.map(function (x) { return '<div class="f"><span class="bad">' + (x.a + 1) + ' and ' + (x.b + 1) + '</span> ' + (x.wasDistinct ? 'differ by ' + x.before.toFixed(0) + ', then by only ' + x.after.toFixed(1) : 'were already close (' + x.after.toFixed(1) + ')') + '</div>'; }).join('') : '<div class="f good">All pairs stay apart.</div>');
+    });
+    $('out').innerHTML = h; $('cl').innerHTML = colors.length < 2 ? '<span class="muted">Add at least two colors.</span>' : cl;
+  }
+  ['t', 's', 'lim', 'mode'].forEach(function (i) { $(i).oninput = run; $(i).onchange = run; });
+  $('t').value = PRE.p2.join('\n'); run();
+})();
+</script>
+</body>
+</html>
