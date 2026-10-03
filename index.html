@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HueClash - will your colors still be told apart?</title>
+<meta name="description" content="Paste chart or UI colors and see which pairs become indistinguishable with protan, deutan or tritan color vision deficiency.">
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; background:#1c1410; color:#f7efe6; line-height:1.6; }
+  .wrap { max-width:680px; margin:0 auto; padding:48px 20px 60px; }
+  .logo { font-size:46px; font-weight:800; } .logo span { color:#fb923c; }
+  .tag { font-size:19px; margin-top:10px; color:#e6d8c9; }
+  .cta { display:inline-block; margin-top:26px; background:#fb923c; color:#1c1410; font-weight:700; padding:14px 30px; border-radius:12px; text-decoration:none; }
+  h2 { font-size:21px; margin:40px 0 10px; } li { color:#c9b8a6; margin-bottom:8px; } ul { margin-left:20px; }
+  .demo { margin-top:26px; background:#2b1f17; border-radius:14px; padding:18px; } .demo b { color:#fb923c; }
+  footer { margin-top:50px; font-size:13px; color:#9a8776; } a { color:#fb923c; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">Hue<span>Clash</span></div>
+  <div class="tag">Your red and your green may be the same color to someone.</div>
+  <a class="cta" href="app.html">Open the app</a>
+  <div class="demo">A red <b>#c8402a</b> and an olive green <b>#6b8e23</b> are far apart in normal vision (difference <b>82</b>). With full deuteranopia the difference drops to <b>2.9</b>: the same color. Blue and orange stay far apart.</div>
+  <h2>What it does</h2>
+  <ul><li>Simulates protan, deutan and tritan vision at any severity</li><li>Side-by-side swatches for every color you paste</li><li>Lists the pairs that collapse, with the before and after difference</li><li>Uses the published Machado 2009 matrices</li></ul>
+  <footer>A screening aid, not a diagnosis; screens and eyes vary. Static, client-side, nothing stored. <a href="https://github.com/iLanis-agent/hueclash">Source</a></footer>
+</div>
+</body>
+</html>
